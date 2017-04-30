@@ -24,8 +24,8 @@ public class Ipv4Client {
             InputStreamReader readIS = new InputStreamReader(getIS, "UTF-8");
             BufferedReader serverMassage = new BufferedReader(readIS);
 
-            byte[] IPv4packet = new byte[32];
-            byte[] destAddr = null ;
+            byte[] IPv4packet ;
+            byte[] destAddr ;
             short cs, length;
             int dataLength = 2;
 
@@ -33,15 +33,14 @@ public class Ipv4Client {
             for (int k = 0 ; k < 12 ; k++){
 
                 length = (short)(20 + dataLength);
+                IPv4packet = new byte[length];
                 System.out.println("Data Length: " + dataLength);
-
 
                 // 0-3
                 IPv4packet[0]= 0b01000101;  // Version + HLen
                 IPv4packet[1]= 0;           // TOS
                 IPv4packet[2]= (byte)((length & 0xFF00)>>>8);     // 1st half of length
                 IPv4packet[3]= (byte)(length & 0x00FF);           // 2nd half of length
-
 
                 // 4-7
                 IPv4packet[4]= 0;           // 1st half of identification
@@ -68,7 +67,7 @@ public class Ipv4Client {
                 }
 
                 // 20-31, Data
-                for (int i = 20; i< 32; i++) {
+                for (int i = 20; i< length; i++) {
                     IPv4packet[i] = 0;
                 }
 
@@ -78,15 +77,13 @@ public class Ipv4Client {
 
 
                 // Send data to the server
-                for (int i = 0; i< 32; i++) {
+                for (int i = 0; i< length; i++) {
                     outStream.write(IPv4packet[i]);
                 }
 
                 // Read respond from the server
                 String massage = serverMassage.readLine();
                 System.out.println(massage+"\n");
-
-
 
                 dataLength *= 2;
             }
